@@ -1,1 +1,1 @@
-folder2-secondFile
+secondFile

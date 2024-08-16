@@ -1,1 +1,1 @@
-folder1-thirdFile
+thirdFile

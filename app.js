@@ -1,40 +1,33 @@
 const {
-  readdir,
-  readFile
-} = require("node:fs/promises");
-const path = require("path");
+  shallowCompare,
+  deepCompare
+} = require('./functions/compareFunc');
+const path = require("node:path");
+const readline = require('readline');
 
-const folder1Path = path.join(__dirname, "folder1");
-const folder2Path = path.join(__dirname, "folder2");
+async function compareFolders() {
+  try {
 
-async function compareFolders(folder1, folder2) {
-  const files1 = await readdir(folder1);
-  const files2 = await readdir(folder2);
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
 
-  if (files1.length !== files2.length) {
-    return console.log("The folders length are different.");
+    const answer1 = await rl.question('please insert type of compare --shallow or --deep and two folder  :', (input) => {
+      const [compareType, folder1, folder2] = input.split(" ")
+      if (compareType === "--shallow") {
+        shallowCompare(folder1, folder2)
+      } else if (compareType === "--deep") {
+        deepCompare(folder1, folder2)
+      } else {
+        console.log("choose the correct type of comparing")
+      }
+      rl.close();
+    });
+
+  } catch (error) {
+    console.log(error)
   }
-
-  files1.sort();
-  files2.sort();
-
-  for (let i = 0; i < files1.length; i++) {
-    if (files1[i] !== files2[i]) {
-      return console.log(`Files differ: ${files1[i]} vs ${files2[i]}`);
-    }
-
-    const file1Path = path.join(folder1, files1[i]);
-    const file2Path = path.join(folder2, files2[i]);
-
-    const content1 = await readFile(file1Path, 'utf8');
-    const content2 = await readFile(file2Path, 'utf8');
-
-    if (content1 !== content2) {
-      return console.log(`the contents of 2 folder are different: ${files1[i]}`);
-    }
-  }
-
-  console.log("The folders contain the same files and contents.");
 }
 
-compareFolders(folder1Path, folder2Path);
+compareFolders();
