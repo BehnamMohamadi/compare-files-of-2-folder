@@ -3,16 +3,12 @@ const {
   readFile
 } = require("node:fs/promises");
 const path = require("node:path");
-const readLine = require("node:readline")
-
-const folder1Path = path.join(__dirname, "folder1");
-const folder2Path = path.join(__dirname, "folder2");
 
 const deepCompare = async (folder1, folder2) => {
 
   try {
-    const files1 = await readdir(folder1);
-    const files2 = await readdir(folder2);
+
+    const [files1, files2] = await Promise.all([readdir(folder1), readdir(folder2)])
 
     if (files1.length !== files2.length) {
       return console.log("files number in each folder are not equal.");
@@ -20,23 +16,21 @@ const deepCompare = async (folder1, folder2) => {
 
     files1.sort();
     files2.sort();
-    for (let i = 0; i < files1.length; i++) {
-      if (files1[i] !== files2[i]) {
-        return console.log(`Files differ: ${files1[i]} vs ${files2[i]}`);
+
+    for (let index = 0; index < files1.length; index++) {
+      if (files1[index] !== files2[index]) {
+        return console.log(`Files differ: ${files1[index]} vs ${files2[index]}`);
       }
 
-      const file1Path = path.join(folder1, files1[i]);
-      const file2Path = path.join(folder2, files2[i]);
+      const file1Path = path.join(folder1, files1[index]);
+      const file2Path = path.join(folder2, files2[index]);
 
-      const content1 = await readFile(file1Path, 'utf8');
-      const content2 = await readFile(file2Path, 'utf8');
+      const [content1, content2] = await Promise.all([readFile(file1Path, "utf-8"), readFile(file2Path, "utf-8")])
 
       if (content1 !== content2) {
-        return console.log(`the contents of 2 folder are different: ${files1[i]}`);
+        return console.log(`the contents of 2 folder are different: ${files1[index]}`);
       }
     }
-
-
 
     console.log("The folders contain the same files and contents.");
   } catch (error) {
@@ -45,8 +39,8 @@ const deepCompare = async (folder1, folder2) => {
 }
 
 const shallowCompare = async (folder1, folder2) => {
-  const files1 = await readdir(folder1);
-  const files2 = await readdir(folder2);
+
+  const [files1, files2] = await Promise.all([readdir(folder1), readdir(folder2)])
 
   if (files1.length !== files2.length) {
     return console.log("The folders length are different.");
@@ -54,9 +48,10 @@ const shallowCompare = async (folder1, folder2) => {
 
   files1.sort();
   files2.sort();
-  for (let i = 0; i < files1.length; i++) {
-    if (files1[i] !== files2[i]) {
-      return console.log(`Files differ: ${files1[i]} vs ${files2[i]}`);
+
+  for (let index = 0; index < files1.length; index++) {
+    if (files1[index] !== files2[index]) {
+      return console.log(`Files differ: ${files1[index]} vs ${files2[index]}`);
     }
   }
 
